@@ -1,0 +1,374 @@
+/* Trigger — shares the compact-control look with DateRangePicker and
+ * the tickets filter chip pill. Every variable comes from the
+ * `--control-*` token group so all three controls track together.
+ *
+ * **Default is stretch-to-container.** A bare `<Combobox>` fills the
+ * width of its parent — that's almost always what callers want
+ * (nav-cell, form-field, picker-row). Add `compact` to opt into the
+ * old 160–320px toolbar-pill range. */
+.trigger {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  align-items: center;
+  gap: 6px;
+  height: var(--control-height);
+  padding: 0 6px 0 var(--control-padding-x);
+  background: var(--control-bg);
+  border: 1px solid var(--control-border);
+  border-radius: var(--control-radius);
+  font-family: inherit;
+  font-size: var(--control-font-size);
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+/* Toolbar-pill opt-out. Reverts to the prior inline 160–320px size
+ * range so callers that want a hand-sized control in a free-form
+ * toolbar (rather than filling a flex cell) can still opt in. */
+.triggerCompact {
+  display: inline-flex;
+  width: auto;
+  min-width: 160px;
+  max-width: 320px;
+}
+
+.trigger:hover {
+  border-color: var(--control-border-hover);
+}
+
+.trigger:focus-visible,
+.trigger[data-open='true'] {
+  outline: none;
+  border-color: var(--control-border-focus);
+  box-shadow: var(--control-focus-ring);
+}
+
+.trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.leading {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.triggerBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  overflow: hidden;
+}
+
+.placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* Primary label — readable color, keeps full weight. */
+.valueLabel {
+  flex-shrink: 0;
+  color: var(--color-text);
+}
+
+/* Sublabel rides inline after a separator (rendered as plain text
+ * inside `.value`). Dim color so the eye still parses the primary
+ * label first; `flex-shrink` lets it truncate when the trigger gets
+ * narrow without sacrificing the primary key. */
+.valueSublabel {
+  color: var(--color-text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 1px 4px 1px 6px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  max-width: 16ch;
+}
+
+.chipLabel {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chipRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+}
+
+.chipRemove:hover {
+  background: color-mix(in srgb, var(--color-error) 15%, transparent);
+  color: var(--color-error);
+}
+
+.chipMore {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.clear:hover {
+  background: color-mix(in srgb, var(--color-error) 15%, transparent);
+  color: var(--color-error);
+}
+
+.caret {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+/* ---- Popup ----------------------------------------------------------- */
+
+.popup {
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-dropdown);
+  /* Match the trigger's width when it's wider than the floor; floor
+   * at 240px so a tiny pill trigger still gives the search input
+   * room. Capped via min(...) to the viewport width so a row-spanning
+   * trigger doesn't push the popup off-screen. */
+  width: min(max(var(--anchor-width, 240px), 240px), 100vw);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  outline: none;
+}
+
+.searchInput {
+  border: 0;
+  border-bottom: 1px solid var(--color-border-light);
+  background: var(--color-surface);
+  border-radius: 0;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: var(--text-compact);
+  color: var(--color-text);
+}
+
+.searchInput:focus {
+  outline: none;
+  background: var(--color-surface-elevated);
+}
+
+/* `block` rather than `flex` so the virtualizer's inner container
+ * (which sets `height: <totalRows * estimateSize>px` to drive the
+ * scrollbar) isn't squashed by flex shrinking. Rows are absolutely
+ * positioned by the virtualizer using `translateY`, so flow layout
+ * isn't needed here. No top padding so the sticky `.headerRow`
+ * (when present) sits flush against the search-input separator. */
+.list {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 0;
+  display: block;
+  background: var(--color-surface-elevated);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) var(--color-surface-elevated);
+}
+
+.list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.list::-webkit-scrollbar-track {
+  background: var(--color-surface-elevated);
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border: 3px solid var(--color-surface-elevated);
+  border-radius: var(--radius-full);
+}
+
+.list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+.empty {
+  padding: 10px 12px;
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  min-height: 32px;
+  padding: 7px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom-color: var(--color-border-light);
+  border-radius: 0;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.item:last-child {
+  border-bottom-color: transparent;
+}
+
+.item[data-active='true'] {
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 10%,
+    var(--color-surface-elevated)
+  );
+  border-color: transparent;
+  border-bottom-color: var(--color-border-light);
+}
+
+.item[data-checked='true'] {
+  background: var(--color-primary-light);
+  border-color: transparent;
+  border-bottom-color: var(--color-border-light);
+}
+
+.item[data-checked='true'][data-active='true'] {
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 16%,
+    var(--color-surface-elevated)
+  );
+  border-color: transparent;
+  border-bottom-color: var(--color-border-light);
+}
+
+.itemCheck {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  /* No margin — the parent `.item` already separates children via
+   * `gap: var(--spacing-sm)`. Always rendered (even when unchecked)
+   * so column edges align between checked rows, unchecked rows, and
+   * the sticky header. */
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.itemLabels {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  align-items: baseline;
+  column-gap: var(--spacing-md);
+}
+
+.itemPrimary {
+  font-weight: 500;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemSecondary {
+  font-size: var(--text-2xs);
+  color: var(--color-text-tertiary);
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemDetailValue {
+  color: var(--color-text-secondary);
+  font-size: var(--text-2xs);
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Sticky column header — uses the same flex+grid layout as `.item`
+ * so its columns line up pixel-for-pixel with the rows below. */
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 6px 12px 5px;
+  border-bottom: 1px solid var(--color-border-light);
+  background: var(--color-surface);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.headerLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  font-size: 9px;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}

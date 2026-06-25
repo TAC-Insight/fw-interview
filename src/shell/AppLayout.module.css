@@ -1,0 +1,151 @@
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  /* `height` rather than `min-height` so the grid is bounded to the
+   * viewport. With `min-height` a tall child would grow the grid,
+   * making the whole page scroll instead of just the table body.
+   *
+   * `dvh` (dynamic viewport) on top of `vh` so iOS/Android browser
+   * chrome (URL bar showing/hiding) doesn't leave a strip of page
+   * either cut off or behind the chrome. */
+  height: 100vh;
+  height: 100dvh;
+  transition: grid-template-columns var(--transition-fast);
+  overflow: hidden;
+}
+
+.layout[data-resizing='true'] {
+  transition: none;
+  user-select: none;
+  cursor: col-resize;
+}
+
+.resizeHandle {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  margin-left: -4px;
+  cursor: col-resize;
+  z-index: var(--z-sticky);
+}
+
+.resizeHandle::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3px;
+  width: 2px;
+  background: transparent;
+  transition: background-color var(--transition-fast);
+}
+
+.resizeHandle:hover::after,
+.layout[data-resizing='true'] .resizeHandle::after {
+  background: var(--color-primary);
+}
+
+/* Content — fills the space after the nav. Carries the page background
+ * tone and the small inset padding around the inner panel. Mirrors
+ * fw-ai's `.app-layout-content`. */
+.content {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) 0;
+  background: var(--color-background);
+  overflow: hidden;
+}
+
+/* Panel — the rounded, bordered surface that pages live inside.
+ * Panel itself does NOT scroll: each page is responsible for managing
+ * its own scroll (list pages bound their table's body; content pages
+ * opt into `overflow-y: auto` on a wrapper). Avoids the double-scroll
+ * surprise where the whole page scrolls instead of just the table.
+ * Mirrors fw-ai's `.app-layout-panel`. */
+.panel {
+  flex: 1;
+  min-height: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mobile drawer trigger — a floating hamburger button shown only when
+ * the drawer is hidden. Sits in the safe-area top-left so it doesn't
+ * get clipped by iOS notches. Pages render their own headers below; we
+ * keep the button compact (32px) and rely on tap-through tolerance
+ * since most page titles have left padding. */
+.mobileTrigger {
+  position: fixed;
+  top: calc(var(--spacing-sm) + env(safe-area-inset-top, 0px));
+  left: calc(var(--spacing-sm) + env(safe-area-inset-left, 0px));
+  z-index: var(--z-sticky);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+.mobileTrigger:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* Dimmer behind the open drawer. Sits below the nav (z-modal - 1) so
+ * the drawer stays on top while taps anywhere else dismiss. Plain
+ * <button> so keyboard users can still escape via tab + enter. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal) - 1);
+  background: var(--color-backdrop);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  animation: scrimIn var(--transition-fast) ease-out;
+}
+@keyframes scrimIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    /* Single column on mobile — the nav is an overlay, not a column,
+     * so content fills the viewport whether the drawer is open or
+     * closed. */
+    grid-template-columns: 1fr;
+  }
+  .resizeHandle {
+    display: none;
+  }
+  /* Tighten the page surround on mobile — every pixel matters at
+   * narrow widths. Carve out a 44px gutter at the top-left for the
+   * floating hamburger trigger so page headers don't sit under it.
+   * (Bottom + right keep the standard tight inset.) */
+  .content {
+    padding: 44px var(--spacing-xs) var(--spacing-xs) var(--spacing-xs);
+  }
+  .panel {
+    border-radius: var(--radius-md);
+  }
+}

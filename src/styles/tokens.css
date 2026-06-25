@@ -1,0 +1,169 @@
+/*
+ * Design tokens — copied from fw-unified so this shell reads as the same
+ * product. Only this file declares raw values; components consume
+ * var(--token-name). Dark theme is the [data-theme="dark"] override block.
+ */
+
+:root {
+  /* Brand */
+  --color-primary: #2fa84e;
+  --color-primary-hover: #268f42;
+  --color-primary-light: #edf6ee;
+
+  /* Surfaces — neutral with a whisper of warmth (Tailwind "stone"). */
+  --color-background: #f5f5f4;
+  --color-background-secondary: #ebe9e7;
+  --color-background-tertiary: #dfdcd9;
+  --color-surface: #fafaf9;
+  --color-surface-hover: #eeecea;
+  --color-surface-elevated: #ffffff;
+  --color-border: #d6d3d1;
+  --color-border-light: #e7e5e4;
+  --color-border-strong: #a8a29e;
+  --color-border-input: #b8b3ae;
+
+  /* Text */
+  --color-text: #292524;
+  --color-text-secondary: #57534e;
+  --color-text-tertiary: #78716c;
+  --color-text-inverse: #ffffff;
+  --color-surface-inverse: #292524;
+
+  /* Semantic */
+  --color-success: #2fa84e;
+  --color-success-light: #e8f5eb;
+  --color-error: #dc3545;
+  --color-error-light: #fcecee;
+  --color-warning: #e59a1f;
+  --color-warning-light: #fdf5e4;
+  --color-info: #3b82f6;
+  --color-info-light: #eff6ff;
+
+  --color-danger: var(--color-error);
+
+  /* Palette (charts, badges) */
+  --color-green-600: #16a34a;
+  --color-blue-600: #2563eb;
+  --color-amber-600: #d97706;
+  --color-red-600: #dc2626;
+  --color-purple-600: #9333ea;
+  --color-teal-600: #0891b2;
+
+  /* Backdrop — modal/scrim overlay tint. */
+  --color-backdrop: rgba(0, 0, 0, 0.4);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.25);
+
+  /* Spacing */
+  --spacing-2xs: 0.125rem;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Radii */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-ui:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+  --font-mono:
+    'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-xs: 0.75rem; /* 12px */
+  --text-compact: 0.8125rem; /* 13px */
+  --text-sm: 0.875rem; /* 14px */
+  --text-base: 1rem; /* 16px */
+  --text-lg: 1.125rem; /* 18px */
+  --text-xl: 1.25rem; /* 20px */
+  --text-2xl: 1.5rem; /* 24px */
+  --text-3xl: 1.875rem; /* 30px */
+
+  --leading-tight: 1.4;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.6;
+
+  --letter-spacing-tight: -0.01em;
+  --letter-spacing-tighter: -0.02em;
+  --letter-spacing-wide: 0.04em;
+
+  /* Controls — the canonical look for compact inline inputs (toolbars,
+   * filter rows). Every compact control pulls from these so they read as
+   * one input family at 28px. */
+  --control-height: 28px;
+  --control-padding-x: 8px;
+  --control-radius: var(--radius-md);
+  --control-bg: var(--color-surface-elevated);
+  --control-bg-hover: var(--color-surface-hover);
+  --control-border: var(--color-border-input);
+  --control-border-hover: var(--color-text-tertiary);
+  --control-border-focus: var(--color-primary);
+  --control-focus-ring: 0 0 0 2px var(--color-primary-light);
+  --control-font-size: var(--text-compact);
+
+  /* Motion */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* Z-index scale */
+  --z-sticky: 10;
+  --z-dropdown: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+  --z-popover: 400;
+
+  /* Layout */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 48px;
+  --max-content-width: 900px;
+}
+
+[data-theme='dark'] {
+  --color-background: #232020;
+  --color-background-secondary: #2c2826;
+  --color-background-tertiary: #363230;
+  --color-surface: #2c2826;
+  --color-surface-hover: #3f3a37;
+  --color-surface-elevated: #363230;
+  --color-border: #433e3a;
+  --color-border-light: #363230;
+  --color-border-strong: #5c5650;
+  --color-border-input: #4d4843;
+
+  --color-text: #f2f0ed;
+  --color-text-secondary: #b0a99f;
+  --color-text-tertiary: #7d756c;
+  --color-text-inverse: #232020;
+  --color-surface-inverse: #f2f0ed;
+
+  --color-primary-light: rgba(47, 168, 78, 0.15);
+  --color-success-light: rgba(47, 168, 78, 0.15);
+  --color-error-light: rgba(220, 53, 69, 0.15);
+  --color-warning-light: rgba(229, 154, 31, 0.15);
+  --color-info-light: rgba(59, 130, 246, 0.15);
+
+  --color-green-600: #22c55e;
+  --color-blue-600: #3b82f6;
+  --color-amber-600: #f59e0b;
+  --color-red-600: #ef4444;
+  --color-purple-600: #a855f7;
+  --color-teal-600: #22d3ee;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+  --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.5);
+}

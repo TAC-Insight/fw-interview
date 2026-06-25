@@ -1,0 +1,433 @@
+/* Table primitive — div-based with ARIA table semantics so absolutely
+ * positioned rows can be virtualized without breaking real <table> layout.
+ *
+ * Layout:
+ *   frame
+ *   ├── headerScroll (overflow-x: hidden; JS-driven scrollLeft tracks body)
+ *   │     └── headerRow (min-width: max-content)
+ *   ├── bodyScroll (overflow: auto + scrollbar-gutter: stable)
+ *   │     └── bodyHolder (height = total virtual; rows absolutely positioned)
+ *   └── footer
+ *
+ * The header is in its own scroll context with no visible scrollbar; the
+ * body is the only thing with overflow:auto. That puts the vertical
+ * scrollbar in the body row only — pinned to the right edge of the
+ * visible area, never beside the header. Horizontal scroll is driven by
+ * the body; the header's scrollLeft is JS-synced on every scroll event
+ * so the columns stay aligned. */
+
+.frame {
+  display: flex;
+  flex-direction: column;
+  /* Transparent — let the host (panel, dashboard card, etc.) decide
+   * the surface tone. The header still has its own background so the
+   * column row reads clearly on any host. */
+  background: transparent;
+  /* Border and radius are provided by the host (AppLayout panel) when
+   * the table fills the panel. When a table is embedded inside other
+   * content the caller adds its own border via wrapper if needed. */
+  overflow: hidden;
+  isolation: isolate;
+  flex: 1;
+  min-height: 0;
+}
+
+.headerScroll {
+  overflow: hidden;
+  /* Single hairline separating header from data. The only horizontal
+   * line inside the table — row separation comes from background +
+   * hover, not borders. */
+  box-shadow: inset 0 -1px 0 var(--color-border);
+  background: var(--color-background-secondary);
+  flex-shrink: 0;
+  /* Mirrors the body's actual vertical-scrollbar gutter (set by JS in
+   * Table.tsx via a ResizeObserver). Keeps the header's right edge
+   * aligned with the body's right edge regardless of platform
+   * scrollbar width. */
+  padding-right: var(--scrollbar-gutter, 0);
+  box-sizing: border-box;
+}
+
+.bodyScroll {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  /* No `scrollbar-gutter: stable` — small tables that never overflow
+   * use the full width. When a vertical scrollbar does appear, the
+   * ResizeObserver in Table.tsx mirrors the resulting gutter onto the
+   * header's padding-right so the columns stay aligned. */
+  /* The body owns the keyboard-nav tabstop; the active row carries the
+   * visible focus indicator instead of the scroll container. */
+  outline: none;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  min-width: max-content;
+}
+
+.headerRow {
+  display: flex;
+  /* At least full container width so columns with `grow: true` can
+   * actually expand into remaining space; falls back to max-content
+   * (and triggers horizontal scroll) when sized columns overflow. */
+  min-width: 100%;
+  width: max-content;
+}
+
+.headerCell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.headerCellSortable {
+  cursor: pointer;
+}
+.headerCellSortable:hover {
+  color: var(--color-text);
+}
+
+.headerCellAlignRight {
+  justify-content: flex-end;
+}
+
+/* Per-header aggregation picker — visible only when grouping is active
+ * and the column has an aggregationFn. The trigger shows just the
+ * current symbol so it doesn't crowd the column label; the dropdown
+ * below shows the explicit label alongside. */
+.aggPicker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  color: var(--color-primary);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+.aggPicker:hover,
+.aggPicker[aria-expanded='true'] {
+  background: var(--color-primary-light);
+  color: var(--color-primary-hover);
+}
+
+.aggMenu {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-dropdown);
+  padding: var(--spacing-xs);
+  min-width: 160px;
+  z-index: var(--z-dropdown);
+}
+
+.aggMenuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--text-compact);
+  color: var(--color-text);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 0;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+.aggMenuItem:hover {
+  background: var(--color-surface-hover);
+}
+.aggMenuItem[data-active='true'] {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.aggMenuSymbol {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* Column resize grip — pinned to the right edge of every header cell.
+ * Hairline by default; widens + tints on hover or while dragging so the
+ * affordance is discoverable without crowding the chrome. */
+.resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 6px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+  background: transparent;
+  transition: background-color var(--transition-fast);
+}
+.resizer:hover {
+  background: var(--color-border-strong);
+}
+.resizerActive {
+  background: var(--color-primary) !important;
+}
+
+.sortIcon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text-tertiary);
+}
+.sortIconActive {
+  color: var(--color-primary);
+}
+
+.bodyHolder {
+  position: relative;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* `right: 0` so a column with `grow: true` has room to flex into
+   * the full body width. Sized siblings stay fixed; horizontal scroll
+   * kicks in if their sum exceeds container. */
+  right: 0;
+  min-width: 100%;
+  width: max-content;
+  /* Transparent — like `.frame`, let the host card's tone show
+   * through. Hover/active states paint on top. */
+  background: transparent;
+  transition: background-color var(--transition-fast);
+}
+.row:hover {
+  background: var(--color-surface-hover);
+}
+
+.rowClickable {
+  cursor: pointer;
+}
+
+/* Active row carries the keyboard-nav indicator. We use an inset
+ * box-shadow rather than `outline` so it draws cleanly inside the
+ * row's absolute-positioned bounds and doesn't clip against the
+ * virtualizer's transformed children. The hover background still
+ * applies on top, signalling "you can click this too." */
+.row[data-active='true'] {
+  background: var(--color-primary-light);
+  box-shadow: inset 2px 0 0 var(--color-primary);
+}
+.bodyScroll:focus-within .row[data-active='true'] {
+  background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+}
+
+/* Detail-expand (opt-in via Table `renderDetail`). The row flips to a
+ * vertical stack — the cell row on top, an expandable detail panel
+ * beneath. Height is measured (no fixed inline height), so the panel
+ * can grow the row. Fixed-height tables never get this class. */
+.rowMeasured {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.rowCells {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  min-width: 100%;
+}
+
+.expanderCell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+}
+.expanderCell:hover {
+  color: var(--color-text);
+}
+.expanderChevron {
+  display: inline-flex;
+}
+
+/* Transparent — nesting is signalled by the detail content's own
+ * indent + left rule (see ProductLinesDetail), not a filled tone.
+ * No padding here so an empty panel (while the detail loads) is 0px
+ * tall: the row then grows exactly once, when content arrives. The
+ * detail content owns its own spacing. */
+.detailPanel {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 100%;
+}
+
+.rowGroup {
+  background: var(--color-background-secondary);
+  font-weight: 500;
+  cursor: pointer;
+}
+.rowGroup:hover {
+  background: var(--color-background-tertiary);
+}
+
+.groupCell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+}
+
+.groupChevron {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text-tertiary);
+}
+
+.groupLabel {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.groupCount {
+  color: var(--color-text-tertiary);
+  font-size: var(--text-2xs);
+  background: var(--color-surface);
+  border-radius: var(--radius-full);
+  padding: 0 6px;
+  font-weight: 600;
+}
+
+.cell {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--spacing-md);
+  font-size: var(--text-xs);
+  line-height: 1.2;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.cellAlignRight {
+  justify-content: flex-end;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mono keeps the IDs visually distinct without changing the text size,
+ * so every cell renders at the same vertical metric and the rows
+ * never look uneven. */
+.cellMono {
+  font-family: var(--font-mono);
+}
+
+/* Hairline row + column separators. Opt-in via `data-separators="true"`
+ * on the frame (default-on at the component level). Hairlines are drawn
+ * as inset box-shadows so they don't shift cell metrics and won't fight
+ * the virtualizer's transformed rows. The last column drops its right
+ * shadow so the table doesn't gain a trailing vertical line at the edge.
+ * The active row replaces its bottom hairline with the focus shadow
+ * already defined above (later rule wins). */
+.frame[data-separators='true'] .row {
+  box-shadow: inset 0 -1px 0 var(--color-border-light);
+}
+.frame[data-separators='true'] .row[data-active='true'] {
+  box-shadow:
+    inset 2px 0 0 var(--color-primary),
+    inset 0 -1px 0 var(--color-border-light);
+}
+.frame[data-separators='true'] .headerCell:not(:last-child),
+.frame[data-separators='true'] .cell:not(:last-child) {
+  box-shadow: inset -1px 0 0 var(--color-border-light);
+}
+
+.empty {
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-background-secondary);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  min-height: 28px;
+  flex-shrink: 0;
+}
+
+.footerLeft,
+.footerRight {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.footerMeta {
+  color: var(--color-text-tertiary);
+}
+
+.refreshing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-secondary);
+}
+
+.refreshDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  animation: refreshPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes refreshPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}

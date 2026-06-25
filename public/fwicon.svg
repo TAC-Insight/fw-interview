@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105.24 60.96">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #2fa84e;
+      }
+
+      .cls-2 {
+        fill: #1f2528;
+      }
+    </style>
+  </defs>
+  <g id="Logo_Redesign_2026" data-name="Logo Redesign 2026">
+    <g>
+      <path class="cls-1" d="M18.06,30.03h50.56v10.81c0,4.77-3.88,8.65-8.65,8.65H18.06v-19.46h0Z" transform="translate(40.8 -19) rotate(45)"/>
+      <path class="cls-2" d="M41.44,20.73h68.18v10.81c0,4.77-3.88,8.65-8.65,8.65H32.79v-10.81c0-4.77,3.88-8.65,8.65-8.65Z" transform="translate(42.39 -41.43) rotate(45)"/>
+      <path class="cls-2" d="M3.32,39.33h24.33v10.81c0,4.77-3.88,8.65-8.65,8.65H3.32v-19.46h0Z" transform="translate(39.22 3.42) rotate(45)"/>
+    </g>
+  </g>
+</svg>

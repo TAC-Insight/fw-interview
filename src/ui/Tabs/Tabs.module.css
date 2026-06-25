@@ -1,0 +1,83 @@
+/* Shared tab styling. The container draws a 2px bottom separator;
+ * each tab's own 2px bottom border sits *on top* of that separator
+ * via `margin-bottom: -2px`. Active tabs swap the border color to
+ * primary so the highlight and the separator read as one continuous
+ * line (same thickness, different color under the active tab). */
+
+.tabs {
+  display: flex;
+  gap: var(--spacing-xs);
+  border-bottom: 2px solid var(--color-border-light);
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+.tabs::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tabs::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border: 2px solid var(--color-surface);
+  border-radius: var(--radius-full);
+}
+
+.tabs::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+.tab {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  margin-bottom: -2px;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  /* Locked so sibling section headers can mirror the same metric and
+   * line up to the pixel without resorting to a magic height. */
+  line-height: var(--leading-normal);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.1s ease,
+    color 0.1s ease,
+    border-color 0.1s ease;
+}
+
+.tab:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.tab:focus-visible {
+  outline: none;
+  box-shadow: var(--control-focus-ring);
+}
+
+.tab[data-active='true'] {
+  color: var(--color-primary);
+  font-weight: 600;
+  background: var(--color-primary-light);
+  border-bottom-color: var(--color-primary);
+}
+
+.tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

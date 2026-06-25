@@ -1,0 +1,421 @@
+.nav {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  position: sticky;
+  top: 0;
+  /* Same tone as the content area padding so the chrome reads as a
+   * single continuous surround for the inner panel. */
+  background: var(--color-background);
+  padding: var(--spacing-xs);
+  overflow: hidden;
+  width: var(--sidebar-width);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-xs) var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+  min-height: 28px;
+}
+
+.brand {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+  flex-shrink: 0;
+}
+.iconBtn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 2px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-compact);
+  color: var(--color-text-secondary);
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.link:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+.link[data-active='true'] {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+.link svg {
+  flex-shrink: 0;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.posSection {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xs) 0;
+}
+
+.posRail {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-xs) 0;
+}
+
+.posHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  margin-bottom: 4px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-text-tertiary);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+.posHeader:hover {
+  color: var(--color-text);
+}
+.posHeader[data-active='true'] {
+  color: var(--color-primary);
+}
+
+.posPicker {
+  padding: 0 4px;
+  margin-bottom: var(--spacing-xs);
+}
+
+.posLanes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 0 4px;
+}
+
+.posEmpty {
+  font-size: var(--text-2xs);
+  color: var(--color-text-tertiary);
+  padding: 6px 10px;
+}
+
+/* Single-row lane entry — mirrors fw-ui's `NavLaneScaleReading`:
+ *  lane name + right-aligned scale chip in one line. Sized so a
+ *  five-digit scale reading (e.g. `99999`) still fits without
+ *  squeezing the lane name — the chip is fixed-width tabular-num
+ *  and the name ellipses inside its flex slot. */
+.posLane {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 4px 5px 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+.posLane:hover {
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 8%,
+    var(--color-surface-elevated)
+  );
+  color: var(--color-text);
+}
+.posLane[data-active='true'] {
+  background: color-mix(
+    in srgb,
+    var(--color-primary) 12%,
+    var(--color-surface-elevated)
+  );
+  color: var(--color-primary);
+}
+
+.posLane[data-active='true'] .posLaneName {
+  text-decoration: underline;
+  text-decoration-color: var(--color-primary);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.posLaneName {
+  min-width: 0;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Scale reading chip — red-on-surface mono, like fw-ui's `ScaleReading`.
+ *  Step 9.x replaces the `—` placeholder with the live indicator value
+ *  once the lane store + device-manager stream lands. Switches to
+ *  `--color-success` when the scale reports stable, gated by the
+ *  same `data-stable` attribute that component reads. */
+.posLaneScale {
+  /* Fixed width so the slot doesn't reflow as digits arrive/leave.
+   *  Sized to fit a comma-formatted 6-digit reading (`999,999`)
+   *  with breathing room at the smaller mono size. */
+  min-width: 42px;
+  max-width: 54px;
+  text-align: center;
+  padding: 2px 5px;
+  background: var(--color-scale-display-bg);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-error);
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.posLaneScale[data-stable='true'] {
+  color: var(--color-success);
+}
+/* The active-lane rule above tints the whole row `--color-primary`,
+ *  which inherits into the chip and overrides our `color` declaration
+ *  (attribute selector boosts specificity past a single class). Re-
+ *  assert here so the scale reading stays red/green regardless of
+ *  whether the operator is on this lane's page. */
+.posLane[data-active='true'] .posLaneScale {
+  color: var(--color-error);
+}
+.posLane[data-active='true'] .posLaneScale[data-stable='true'] {
+  color: var(--color-success);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border-light);
+  margin: var(--spacing-xs) 0;
+}
+
+.statusRow {
+  display: flex;
+  align-items: stretch;
+  padding: var(--spacing-xs) var(--spacing-xs);
+  margin: var(--spacing-xs) 0;
+}
+
+.tenantSwitch {
+  display: flex;
+  align-items: stretch;
+  padding: var(--spacing-xs);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.tenantControl {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tenantLabel {
+  font-size: var(--text-2xs);
+  color: var(--color-text-tertiary);
+  line-height: 1;
+}
+
+.userRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+  border-top: 1px solid var(--color-border-light);
+  margin-top: var(--spacing-xs);
+}
+
+.avatar {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.userInfo {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.userName {
+  font-size: var(--text-compact);
+  color: var(--color-text);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tenantName {
+  font-size: var(--text-2xs);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Collapsed state — hide text, center icons. */
+.nav[data-collapsed='true'] .link {
+  padding: var(--spacing-sm);
+  justify-content: center;
+}
+.nav[data-collapsed='true'] .link > span,
+.nav[data-collapsed='true'] .userInfo {
+  display: none;
+}
+.nav[data-collapsed='true'] .header {
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
+}
+.nav[data-collapsed='true'] .statusRow {
+  justify-content: center;
+  padding: var(--spacing-xs);
+}
+.nav[data-collapsed='true'] .tenantSwitch {
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-xs);
+}
+.nav[data-collapsed='true'] .tenantControl {
+  display: none;
+}
+/* Hide settings + logout when collapsed; just show the avatar. The avatar
+ * itself becomes a click target that re-expands the nav so the buttons
+ * are reachable. */
+.nav[data-collapsed='true'] .userRow {
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-xs);
+}
+.nav[data-collapsed='true'] .userRow > .iconBtn {
+  display: none;
+}
+
+/* Mobile: drawer that slides in over content. Closed by default so the
+ * user sees the page first; opened via the AppLayout's floating
+ * hamburger trigger. Width fixes to a comfortable touch target size
+ * regardless of the desktop `--sidebar-width` value. */
+@media (max-width: 768px) {
+  .nav {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(86vw, 320px);
+    z-index: var(--z-modal);
+    /* `data-collapsed` is desktop-only on mobile (a desktop user
+     * could resize the window down with collapsed=true persisted);
+     * force the full layout when the drawer slides in. */
+    padding: var(--spacing-sm);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(-100%);
+    transition: transform var(--transition-fast);
+    /* Disable interaction while off-screen — otherwise focusable
+     * children (links, buttons) stay reachable to keyboard + AT. */
+    visibility: hidden;
+  }
+  .nav[data-mobile-open='true'] {
+    transform: translateX(0);
+    visibility: visible;
+  }
+  /* Force the expanded layout regardless of the desktop `collapsed`
+   * flag — the drawer is always "full" when it slides in. */
+  .nav .link {
+    padding: 8px 10px;
+    justify-content: flex-start;
+  }
+  .nav .link > span,
+  .nav .userInfo {
+    display: flex;
+  }
+  .nav .header {
+    justify-content: space-between;
+    flex-direction: row;
+    padding: var(--spacing-xs) var(--spacing-xs);
+  }
+  .nav .statusRow {
+    justify-content: stretch;
+  }
+  .nav .tenantSwitch {
+    justify-content: flex-start;
+  }
+  .nav .tenantControl {
+    display: flex;
+  }
+  .nav .userRow {
+    justify-content: flex-start;
+  }
+  .nav .userRow > .iconBtn {
+    display: inline-flex;
+  }
+  /* Bigger tap targets for everything inside the drawer. */
+  .iconBtn {
+    width: 32px;
+    height: 32px;
+  }
+  .avatar {
+    width: 30px;
+    height: 30px;
+    font-size: var(--text-2xs);
+  }
+}

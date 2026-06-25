@@ -1,0 +1,63 @@
+/* "Jump to…" launcher button — extracted verbatim from fw-unified's
+ * CommandPalette.module.css. The palette itself is out of scope, so the
+ * launcher is a styled stub that matches the real product. */
+
+.launcher {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 6px 10px;
+  margin: 0 var(--spacing-xs) var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  background: var(--color-background-secondary);
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text-secondary);
+  font-size: var(--text-compact);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+  width: calc(100% - 2 * var(--spacing-xs));
+  text-align: left;
+}
+.launcher:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+.launcher svg {
+  flex-shrink: 0;
+}
+.launcherLabel {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.launcherKbd {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-tertiary);
+  font-family: var(--font-mono, monospace);
+}
+
+.launcherCollapsed {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+  margin: 0 auto var(--spacing-xs);
+}
+.launcherCollapsed:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}

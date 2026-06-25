@@ -1,0 +1,18 @@
+.popup {
+  max-width: 280px;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-surface-inverse);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  line-height: 1.35;
+  box-shadow: var(--shadow-md);
+  z-index: var(--z-popover);
+  pointer-events: none;
+}
+
+.arrow {
+  width: 8px;
+  height: 8px;
+  fill: var(--color-surface-inverse);
+}

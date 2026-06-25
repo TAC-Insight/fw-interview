@@ -1,0 +1,331 @@
+/* Dashboard layout — Linear-inspired: hairline borders, no shadows,
+ * tight type, monochrome by default. Hierarchy comes from whitespace
+ * and the panel surface, not card chrome. */
+
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.scroller {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  /* Container for child @container queries — lets the summary strip
+   * and any future responsive blocks react to the panel width
+   * (which shrinks with the LeftNav), not the window. */
+  container-type: inline-size;
+}
+
+/* ---- Filter row ------------------------------------------------------ */
+
+.filters {
+  display: flex;
+  align-items: end;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  /* Lift the trigger controls off the panel so they read as inputs.
+   * Scoped here rather than globally so the tickets toolbar chips —
+   * which sit on the table toolbar and are meant to blend — stay put. */
+  --control-bg: var(--color-surface-elevated);
+}
+
+.filterField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 180px;
+}
+
+.filterLabel {
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+}
+
+.filterSpacer {
+  flex: 1;
+}
+
+/* ---- Summary strip --------------------------------------------------- */
+
+/* Single horizontal strip with hairline dividers between cells. The
+ * outer border + `gap: 1px` over a tinted background draws the
+ * dividers automatically, and stays correct when cells wrap. */
+.statStrip {
+  display: grid;
+  /* Discrete breakpoints (2 → 3 → 6) rather than auto-fit, which
+   * orphans the last cell on a row of its own at awkward widths.
+   * Breakpoints reference the scroller container so the LeftNav
+   * collapse/expand counts. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--color-border-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  /* Inside a column flex container, overflow:hidden turns min-height:auto
+   * into 0 — without flex-shrink:0 the strip collapses when sibling
+   * content would otherwise need to be scrolled. */
+  flex-shrink: 0;
+}
+
+@container (min-width: 480px) {
+  .statStrip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 900px) {
+  .statStrip {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.statCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface-elevated);
+  min-width: 0;
+}
+
+.statValue {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: var(--letter-spacing-tight);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+  line-height: var(--leading-tight);
+}
+
+.statLabel {
+  font-size: var(--text-2xs);
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+}
+
+.statPulse {
+  display: inline-block;
+  min-width: 4ch;
+  height: 0.9em;
+  background: var(--color-background-tertiary);
+  border-radius: var(--radius-sm);
+  animation: dashPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes dashPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Section-header refreshing tag — reuses the muted meta color and
+ * pulses while sync is writing the underlying table. */
+.refreshingTag {
+  font-style: italic;
+  color: var(--color-text-tertiary);
+  animation: dashPulse 1.6s ease-in-out infinite;
+}
+
+/* No animation on stat values during background refresh — pulsing
+ * numbers reads as "these are about to change" even when Sync is
+ * just re-confirming the same rows. The section-header chips
+ * (`refreshingTag`) cover the in-flight signal where it belongs. */
+
+/* Skeleton block for the chart while the initial query is pending. */
+.chartPulse {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-md);
+  background: var(--color-background-tertiary);
+  animation: dashPulse 1.6s ease-in-out infinite;
+}
+
+/* ---- Section (breakdown + chart) ------------------------------------- */
+
+/* No card chrome. Sections sit directly on the panel surface. A
+ * section header carries the title (or tab strip) and any summary
+ * stat; the body sits flush below. */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  /* Match `<Tabs>`'s natural height by mirroring its construction:
+   * `var(--spacing-xs)` vertical padding + `var(--leading-normal)`
+   * line-height on the inline title + 2px bottom border. A tabs-as-
+   * header section and a title-as-header section line up structurally,
+   * not via a magic pixel lock. */
+  padding: var(--spacing-xs) 0;
+  border-bottom: 2px solid var(--color-border-light);
+  box-sizing: border-box;
+}
+
+/* Section-header link styled the same as `.sectionMeta`. */
+.sectionMetaLink {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  transition: color 0.1s ease;
+}
+
+.sectionMetaLink:hover {
+  color: var(--color-text);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--text-sm);
+  /* Locked so the header height derives from the title metrics and
+   * matches `<Tabs>`'s tab buttons (which lock the same line-height). */
+  line-height: var(--leading-normal);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.sectionMeta {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Side-by-side row (breakdown + recent tickets) ------------------ */
+
+.row2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--spacing-lg);
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .row2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- Breakdown (tabs + ranked table with inline bars) ---------------- */
+
+.breakdownTableSlot {
+  height: 360px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.bdName {
+  color: var(--color-text);
+}
+
+/* Secondary name (full-cell), e.g. the "Description" column rendered
+ * next to the primary id. */
+.bdSubname {
+  color: var(--color-text);
+}
+
+/* Inline em-dash placeholder for empty cells — picks up the cell's
+ * existing alignment without nudging itself. */
+.bdPlaceholder {
+  color: var(--color-text-tertiary);
+}
+
+/* Inline horizontal bar that fills a Share cell up to (--bar)% of its
+ * width. Grows from the left so rows read like a Linear-style ranked
+ * list. The cell renders only the bar — the units column to its left
+ * already carries the number. */
+.bdBarTrack {
+  position: relative;
+  width: 100%;
+  height: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  overflow: hidden;
+}
+
+.bdBarFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--bar, 0%);
+  background: var(--color-primary);
+  opacity: 0.65;
+  border-radius: var(--radius-sm);
+}
+
+.bdJumpLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height);
+  height: var(--control-height);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  transition:
+    background 0.1s ease,
+    color 0.1s ease;
+}
+
+.bdJumpLink:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* ---- Chart areas ----------------------------------------------------- */
+
+.chartArea {
+  height: 260px;
+}
+
+/* Empty state used inside chart containers. Mirrors `Table`'s
+ * `.empty` styling so a dashboard page reads as one product whether
+ * a section is a ranked table or a chart. */
+.chartEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--spacing-xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+}
+
+/* ---- Tooltip used inside chart components ---------------------------- */
+
+.tooltip {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--text-xs);
+  box-shadow: var(--shadow-sm);
+}
+
+.tooltipLabel {
+  color: var(--color-text-tertiary);
+  margin-bottom: 2px;
+}
+
+.tooltipValue {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}

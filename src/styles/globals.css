@@ -1,0 +1,59 @@
+@import './reset.css';
+@import './tokens.css';
+
+html {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+
+::selection {
+  background: var(--color-primary-light);
+  color: var(--color-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Scrollbars — thin and themed. */
+:root {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  -webkit-appearance: none;
+  background-color: var(--color-border-strong);
+  border-radius: var(--radius-full);
+  min-height: 24px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-secondary);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
