@@ -204,7 +204,8 @@ top of this is your task.
 
 ## How to prepare
 
-You don't need to build anything in advance. Useful prep:
+You don't need to build anything in advance — though you're welcome to. Useful
+prep:
 
 - **Explore the API.** Get familiar with the schema, the entities above, and how
   they relate. Know how you'd pull each one. (You'll need the API key we
