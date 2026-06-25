@@ -150,8 +150,8 @@ reads the key synchronously and redirects out if it's missing. Sign out
 > **You need a real key to load live data.** The login gate accepts any string,
 > but `graphql.fast-weigh.com` rejects anything that isn't a valid
 > Fastweigh-issued key — so the Dashboard (and any query you run) shows an auth
-> error until you enter a real one. **We'll give you a key for the session**; if
-> you want to explore the API during prep, ask us for one ahead of time.
+> error until you enter a real one. **Request a key from us** — reach out ahead
+> of your session, and earlier if you'd like to explore the API during prep.
 
 ## Pages
 
