@@ -16,7 +16,7 @@ export type Align = 'left' | 'right'
 /**
  * `meta` slots attached to column defs for presentation control — the
  * Table reads these to right-align numeric columns and render IDs mono.
- * Ported from fw-unified's Table; this is a streamlined version (no saved
+ * Ported from the production app's Table; this is a streamlined version (no saved
  * views / toolbar / grouping / column resize) that keeps the same markup
  * and CSS so it looks identical.
  */

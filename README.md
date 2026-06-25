@@ -155,8 +155,8 @@ reads the key synchronously and redirects out if it's missing. Sign out
 
 ## Pages
 
-- **Home** (`/`) — the dashboard, **wired to live data** and ported from
-  fw-unified: a Region / Location / date-range filter row, a six-cell summary
+- **Home** (`/`) — the dashboard, **wired to live data**: a Region / Location /
+  date-range filter row, a six-cell summary
   strip (loads, units, customers, orders, trucks, products), a tabbed breakdown
   table (Products / Customers / Orders / Trucks / Locations) beside a recent-
   tickets table, and a units-by-date area chart. Everything derives from one
@@ -173,9 +173,9 @@ the sync-status panel is intentionally omitted — those belong to your task.
 
 The app is a **React 19 + TypeScript + Vite** SPA using **TanStack Router**
 (file-based routing, auto code-splitting) and **Base UI** (`@base-ui/react`) for
-interactive primitives. The shell, components, and styling are ported from
-`fw-unified`: **plain CSS Modules + a design-token file** (`src/styles/tokens.css`)
-— no Tailwind, no CSS-in-JS. The folder layout mirrors fw-unified:
+interactive primitives. The shell, components, and styling come from our
+production app: **plain CSS Modules + a design-token file** (`src/styles/tokens.css`)
+— no Tailwind, no CSS-in-JS. The folder layout mirrors that app:
 
 ```
 src/

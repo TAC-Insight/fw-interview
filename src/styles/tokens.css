@@ -1,5 +1,5 @@
 /*
- * Design tokens — copied from fw-unified so this shell reads as the same
+ * Design tokens — copied from the production app so this shell reads as the same
  * product. Only this file declares raw values; components consume
  * var(--token-name). Dark theme is the [data-theme="dark"] override block.
  */

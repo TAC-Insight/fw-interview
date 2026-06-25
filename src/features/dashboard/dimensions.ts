@@ -1,5 +1,5 @@
 /**
- * Client-side breakdown aggregation. fw-unified does this in SQL against
+ * Client-side breakdown aggregation. The production app does this in SQL against
  * the local synced DB; here we group the fetched ticket set in memory so
  * the same five dimension tabs work off one network query.
  */

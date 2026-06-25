@@ -1,5 +1,5 @@
 /**
- * Tiny className joiner. Same helper fw-unified inlines in every component;
+ * Tiny className joiner. Same helper the production app inlines in every component;
  * hoisted here so the UI wrappers can share it.
  *
  *   cx(styles.button, isActive && styles.active, className)

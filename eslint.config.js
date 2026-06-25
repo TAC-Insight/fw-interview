@@ -21,7 +21,7 @@ export default [
       '@typescript-eslint/require-await': 'off',
       'pnpm/json-enforce-catalog': 'off',
       // Allow single-letter type params (e.g. Combobox<V>) alongside the
-      // default T-prefixed names — matches fw-unified.
+      // default T-prefixed names — matches the production app.
       '@typescript-eslint/naming-convention': [
         'error',
         {

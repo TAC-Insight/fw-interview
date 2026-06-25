@@ -1,4 +1,4 @@
-/** Primary navigation items — mirrors fw-unified's LeftNav. */
+/** Primary navigation items — mirrors the production app's LeftNav. */
 
 import {
   ClipboardList,

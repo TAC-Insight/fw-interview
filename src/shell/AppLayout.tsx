@@ -7,7 +7,7 @@ import styles from './AppLayout.module.css'
 
 /**
  * Authenticated layout — a resizable/collapsible left rail and a content
- * panel. Ported from fw-unified's AppLayout, minus the command palette and
+ * panel. Ported from the production app's AppLayout, minus the command palette and
  * bootstrap overlay. There is no top bar: pages fill the panel directly.
  */
 export function AppLayout({ children }: { children: ReactNode }) {
