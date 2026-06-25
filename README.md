@@ -5,11 +5,10 @@ Engineer session. It's also your **pre-read**: read this before your session so
 you walk in oriented and can spend the live time on the interesting parts.
 There's nothing to submit ahead of time.
 
-The shell gives you a signed-in console UI — left nav, top bar, a finished
-Dashboard wired to live data, and a set of stubbed pages. **The shell is
-deliberately just the shell.** Your
-task in the session is to design and build a slice of the **local-first data +
-sync layer** on top of it: local persistence, caching, offline support, an
+The shell gives you a signed-in console UI — a left nav, a finished Dashboard
+wired to live data, and a set of stubbed pages. **The shell is deliberately
+just the shell.** Your task in the session is to design and build a slice of the
+**local-first data + sync layer** on top of it: local persistence, caching, offline support, an
 outbox/sync engine, and the data layer that feeds the UI. None of that is
 implemented here, on purpose.
 
@@ -58,21 +57,21 @@ for reporting and on-device PDF generation.
 
 ### Entities to sync
 
-Roughly fifteen entities, with approximate per-tenant row counts. **The scale
+Roughly ten entities, with approximate per-tenant row counts. **The scale
 varies enormously across entities — that's not an accident, and it's worth
 thinking about what it implies.**
 
-| Entity         | Approx. rows (per tenant)                          |
-| -------------- | -------------------------------------------------- |
-| Customers      | thousands                                          |
-| Orders         | thousands                                          |
-| Order Products | tens of thousands                                  |
-| Products       | hundreds                                           |
-| Trucks         | thousands                                          |
-| Haulers        | hundreds                                           |
-| Regions        | tens                                               |
-| Locations      | tens                                               |
-| Yards          | tens                                               |
+| Entity           | Approx. rows (per tenant)                                          |
+| ---------------- | ------------------------------------------------------------------ |
+| Customers        | thousands                                                          |
+| Orders           | thousands                                                          |
+| Order Products   | tens of thousands                                                  |
+| Products         | hundreds                                                           |
+| Trucks           | thousands                                                          |
+| Haulers          | hundreds                                                           |
+| Regions          | tens                                                               |
+| Locations        | tens                                                               |
+| Yards            | tens                                                               |
 | **Load Tickets** | **highly variable — 10–50k for many tenants, 1,000,000+ for some** |
 
 Load Tickets is the primary transactional record and by far the largest and most
@@ -130,21 +129,29 @@ npm run dev        # http://localhost:3000
 Other scripts:
 
 ```bash
-npm run build      # type-aware production build (vite)
+npm run build      # type-check (tsc) + production build (vite)
+npm run typecheck  # tsc --noEmit
 npm run lint       # eslint (tanstack config)
-npm run format     # prettier + eslint --fix
+npm run test       # vitest (green with no tests yet)
+npm run format     # prettier --write + eslint --fix
 npm run generate-routes   # regenerate src/routeTree.gen.ts (also runs in dev)
 ```
 
 ## Auth
 
-Auth is a single **API key**. On first load you're redirected to `/login`; paste
-any non-empty key and you're in. There is **no validation** — any string is
-accepted — because there's no backend session here. The key is stored in
-`localStorage` (`fw-interview.apiKey`) and sent as a `Bearer` token by the
-GraphQL client. Every page except `/login` is gated: the `/_app` layout route's
-`beforeLoad` reads the key synchronously and redirects out if it's missing. Sign
-out (sidebar, bottom-left) clears the key.
+Auth is a single **API key**. On first load you're redirected to `/login`. The
+local login gate does **no validation** — any non-empty string lets you in,
+because there's no backend session here. The key is stored in `localStorage`
+(`fw-interview.apiKey`) and sent as a `Bearer` token by the GraphQL client.
+Every page except `/login` is gated: the `/_app` layout route's `beforeLoad`
+reads the key synchronously and redirects out if it's missing. Sign out
+(sidebar, bottom-left) clears the key.
+
+> **You need a real key to load live data.** The login gate accepts any string,
+> but `graphql.fast-weigh.com` rejects anything that isn't a valid
+> Fastweigh-issued key — so the Dashboard (and any query you run) shows an auth
+> error until you enter a real one. **We'll give you a key for the session**; if
+> you want to explore the API during prep, ask us for one ahead of time.
 
 ## Pages
 
@@ -200,7 +207,8 @@ top of this is your task.
 You don't need to build anything in advance. Useful prep:
 
 - **Explore the API.** Get familiar with the schema, the entities above, and how
-  they relate. Know how you'd pull each one.
+  they relate. Know how you'd pull each one. (You'll need the API key we
+  provide — ask us for one if you want to poke at the API before the session.)
 - **Think about offline-first.** Caching, durable local writes,
   sync/reconciliation, conflict handling, retries. Have a mental model of the
   patterns and trade-offs before you arrive.

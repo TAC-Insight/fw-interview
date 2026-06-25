@@ -112,11 +112,11 @@ export function LeftNav({
           aria-label="Jump bar"
           title="Jump bar (⌘J)"
         >
-          <SearchIcon size={16} className={paletteStyles.launcherIcon} />
+          <SearchIcon size={16} />
         </button>
       ) : (
         <button type="button" className={paletteStyles.launcher}>
-          <SearchIcon size={14} className={paletteStyles.launcherIcon} />
+          <SearchIcon size={14} />
           <span className={paletteStyles.launcherLabel}>Jump to…</span>
           <span className={paletteStyles.launcherKbd}>⌘J</span>
         </button>
